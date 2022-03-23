@@ -1,0 +1,144 @@
+{
+    "expo": {
+        "name": "fairTasting",
+        "facebookScheme": "fb457711701973443",
+        "facebookAppId": "457711701973443",
+        "facebookDisplayName": "fairTasting",
+        "facebookAutoLogAppEventsEnabled": false,
+        "facebookAdvertiserIDCollectionEnabled": false,
+        "slug": "fairTasting",
+        "owner": "fairtasting",
+        "version": "1.4.34",
+        "orientation": "portrait",
+        "icon": "./assets/images/icon.png",
+        "scheme": "fairtasting",
+        "userInterfaceStyle": "automatic",
+        "hooks": {
+            "postPublish": [
+                {
+                    "file": "sentry-expo/upload-sourcemaps",
+                    "config": {
+                        "organization": "fairtasting",
+                        "project": "fairtasting-app",
+                        "authToken": "bb2e9e74bb51405eba8e28f5de30eaaa6a602722aa8f41a4989a89f6997ad046"
+                    }
+                }
+            ]
+        },
+        "splash": {
+            "image": "./assets/images/splash.png",
+            "resizeMode": "cover",
+            "backgroundColor": "#71142D"
+        },
+        "updates": {
+            "fallbackToCacheTimeout": 0
+        },
+        "assetBundlePatterns": [
+            "**/*"
+        ],
+        "plugins": [
+            "./plugins",
+            [
+                "@stripe/stripe-react-native",
+                {
+                    "merchantIdentifier": "merchant.com.fairtasting.app",
+                    "enableGooglePay": true
+                }
+            ],
+            [
+                "expo-tracking-transparency",
+                {
+                    "userTrackingPermission": "This identifier will be used to deliver personalized content to you."
+                }
+            ],
+            "expo-apple-authentication",
+            [
+                "expo-facebook",
+                {
+                    "userTrackingPermission": false
+                }
+            ],
+            [
+                "expo-image-picker",
+                {
+                    "photosPermission": "The app accesses your photos to let you find wines in your memories."
+                }
+            ],
+            "expo-updates"
+        ],
+        "ios": {
+            "supportsTablet": true,
+            "bundleIdentifier": "com.fairtasting.app",
+            "googleServicesFile": "./GoogleService-Info.plist",
+            "buildNumber": "1.4.34",
+            "infoPlist": {
+                "NSCameraUsageDescription": "This app uses the camera to allow users to send photos for wine ratings. Your photos wont be shared without your permission.",
+                "NSMicrophoneUsageDescription": "This app uses the microphone to allow users to record and share videos.",
+                "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized content to you.",
+                "NSPhotoLibraryUsageDescription": "This app uses the camera to allow users to send photos for wine ratings. Your photos wont be shared without your permission.",
+                "NSLocationUsageDescription": "This app uses location access to notify user's about events and stores near their location. Your location wont be shared without with third parties.",
+                "NSLocationWhenInUseUsageDescription": "This app uses location access to locate relevant events and stores near the user's location. Your location wont be shared without with third parties.",
+                "CFBundleAllowMixedLocalizations": true
+            },
+            "config": {
+                "usesNonExemptEncryption": false
+            },
+            "entitlements": {
+                "com.apple.developer.in-app-payments": [
+                    "merchant.com.fairtasting.app"
+                ]
+            },
+            "usesAppleSignIn": true
+        },
+        "android": {
+            "package": "com.fairtasting.app",
+            "googleServicesFile": "./google-services.json",
+            "versionCode": 420010434,
+            "permissions": [
+                "ACCESS_COARSE_LOCATION",
+                "ACCESS_FINE_LOCATION"
+            ],
+            "adaptiveIcon": {
+                "foregroundImage": "./assets/images/icon.png",
+                "backgroundColor": "#FFFFFF"
+            },
+            "icon": "./assets/images/icon.png",
+            "config": {
+                "googleSignIn": {
+                    "apiKey": "AIzaSyDSCFMTDcLqvt1GkLUVm4z7TTyqd_vM1W4",
+                    "certificateHash": "4D:B4:5C:C5:C6:5D:90:2A:59:F5:E8:B2:68:63:5B:D2:9A:DF:C0:F6"
+                }
+            }
+        },
+        "web": {
+            "favicon": "./assets/images/icon.png",
+            "config": {
+                "firebase": {
+                    "apiKey": "AIzaSyDQNkkrW9OLGSiLsQCoSqxZVCT9Qqw4034",
+                    "authDomain": "fairtasting-main.firebaseapp.com",
+                    "projectId": "fairtasting-main",
+                    "storageBucket": "fairtasting-main.appspot.com",
+                    "messagingSenderId": "668040840398",
+                    "appId": "1:668040840398:web:10952c23a76d6fb6a6fc9f",
+                    "measurementId": "G-K0MC8F352T"
+                }
+            }
+        },
+        "packagerOpts": {
+            "config": "metro.config.js",
+            "sourceExts": [
+                "expo.ts",
+                "expo.tsx",
+                "expo.js",
+                "expo.jsx",
+                "ts",
+                "tsx",
+                "js",
+                "jsx",
+                "json",
+                "wasm",
+                "svg"
+            ]
+        }
+    }
+}

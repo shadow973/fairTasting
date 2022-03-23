@@ -1,0 +1,305 @@
+version: 2.1
+executors:
+  default:
+    docker:
+      - image: circleci/node:14
+    resource_class: large  
+    working_directory: ~/fairtasting
+  webdefault:
+    docker:
+      - image: circleci/node:14
+    resource_class: large  
+    working_directory: ~/fairtasting-web
+commands:
+  attach_project:
+    steps:
+      - attach_workspace:
+          at: ~/fairtasting
+
+jobs:
+  'Deploy Web to Development':
+    executor: webdefault
+    steps:
+      - checkout
+      - aws-cli/setup 
+      - run:
+          name: Install Sharp CLI
+          command: npm install sharp-cli
+      - run:
+          name: Install Expo CLI
+          command: npm install expo-cli
+      - run:
+          name: Install dependencies
+          command: yarn
+      - run:
+          name: Optimizing
+          command: npx expo-optimize
+      - run:
+          name: Compiling code
+          command: npx expo build:web
+      - run:
+          name: Configuring AWS
+          command: aws configure set region eu-west-1 && aws configure set preview.cloudfront true && aws configure set preview.create-invalidation true
+      - run:
+          name: Synchonizing S3
+          command: aws s3 sync --delete web-build/ s3://dev.fairtasting.com/
+      - run:
+          name: Invalidating Cache
+          command: aws cloudfront create-invalidation --cli-input-json "{\"DistributionId\":\"E1S6XPWI78POE2\",\"InvalidationBatch\":{\"Paths\":{\"Quantity\":1,\"Items\":[\"/*\"]},\"CallerReference\":\"Circle CI Deployment $(date +%s)\"}}"
+      - slack/notify:
+          event: pass
+          template: basic_success_1
+      - slack/notify:
+          event: fail
+          mentions: '@appdevs'
+          template: basic_fail_1
+  'Deploy Web to Testing':
+    executor: webdefault
+    steps:
+      - checkout
+      - aws-cli/setup 
+      - run:
+          name: Install Sharp CLI
+          command: npm install sharp-cli
+      - run:
+          name: Install Expo CLI
+          command: npm install expo-cli
+      - run:
+          name: Install dependencies
+          command: yarn
+      - run:
+          name: Optimizing
+          command: npx expo-optimize
+      - run:
+          name: Compiling code
+          command: npx expo build:web
+      - run:
+          name: Configuring AWS
+          command: aws configure set region eu-west-1 && aws configure set preview.cloudfront true && aws configure set preview.create-invalidation true
+      - run:
+          name: Synchonizing S3
+          command: aws s3 sync --delete web-build/ s3://test.fairtasting.com/
+      - run:
+          name: Invalidating Cache
+          command: aws cloudfront create-invalidation --cli-input-json "{\"DistributionId\":\"ETWPU3AG39T36\",\"InvalidationBatch\":{\"Paths\":{\"Quantity\":1,\"Items\":[\"/*\"]},\"CallerReference\":\"Circle CI Deployment $(date +%s)\"}}"
+      - slack/notify:
+          event: pass
+          template: basic_success_1
+      - slack/notify:
+          event: fail
+          mentions: '@appdevs'
+          template: basic_fail_1
+  'Deploy Web to Production':
+    executor: webdefault
+    steps:
+      - checkout
+      - aws-cli/setup 
+      - run:
+          name: Install Sharp CLI
+          command: npm install sharp-cli
+      - run:
+          name: Install Expo CLI
+          command: npm install expo-cli
+      - run:
+          name: Install dependencies
+          command: yarn
+      - run:
+          name: Optimizing
+          command: npx expo-optimize
+      - run:
+          name: Compiling code
+          command: npx expo build:web
+      - run:
+          name: Configuring AWS
+          command: aws configure set region eu-west-1 && aws configure set preview.cloudfront true && aws configure set preview.create-invalidation true
+      - run:
+          name: Synchonizing S3
+          command: aws s3 sync --delete web-build/ s3://fairtasting.com/
+      - run:
+          name: Invalidating Cache
+          command: aws cloudfront create-invalidation --cli-input-json "{\"DistributionId\":\"E3BHT7VYDH8B3\",\"InvalidationBatch\":{\"Paths\":{\"Quantity\":1,\"Items\":[\"/*\"]},\"CallerReference\":\"Circle CI Deployment $(date +%s)\"}}"
+      - slack/notify:
+          event: pass
+          template: basic_success_1
+      - slack/notify:
+          event: fail
+          mentions: '@appdevs'
+          template: basic_fail_1    
+  'Install Dependencies':
+    executor: default
+    steps:
+      - checkout
+      - attach_project
+      - run:
+          name: Install dependencies
+          command: yarn
+      - persist_to_workspace:
+          root: ~/fairtasting
+          paths:
+            - .
+  'App Store Publish':
+    executor: default
+    steps:
+      - attach_project
+      - run:
+          name: Trigger build
+          no_output_timeout: 30m
+          command: npx eas-cli build --platform ios --non-interactive --wait --profile production
+
+      - run:
+          name: Publish
+          no_output_timeout: 30m
+          command: npx eas-cli submit -p ios --latest --profile production
+      - slack/notify:
+          event: pass
+          template: success_tagged_deploy_1
+      - slack/notify:
+          event: fail
+          mentions: '@appdevs'
+          template: basic_fail_1    
+  'Google Play Publish':
+    executor: default
+    steps:
+      - attach_project
+      - run:
+          name: Trigger build
+          no_output_timeout: 30m
+          command: npx eas-cli build --platform android --non-interactive --wait --profile production
+
+      - run:
+          name: Publish
+          no_output_timeout: 30m
+          command: npx eas-cli submit -p android --latest --profile production
+      - slack/notify:
+          event: pass
+          template: success_tagged_deploy_1
+      - slack/notify:
+          event: fail
+          mentions: '@appdevs'
+          template: basic_fail_1  
+  'EXPO Test Publish':
+    executor: default
+    steps:
+      - attach_project
+      - run:
+          name: Trigger publish
+          no_output_timeout: 30m
+          command: npx expo-cli publish --non-interactive --release-channel testing
+      - slack/notify:
+          event: pass
+          template: basic_success_1
+      - slack/notify:
+          event: fail
+          template: basic_fail_1
+
+  'EXPO Stage Publish':
+    executor: default
+    steps:
+      - attach_project
+      - run:
+          name: Trigger publish
+          no_output_timeout: 30m
+          command: npx expo-cli publish --non-interactive --release-channel staging
+      - slack/notify:
+          event: pass
+          template: basic_success_1
+      - slack/notify:
+          event: fail
+          template: basic_fail_1
+  'OTA Production Publish':
+    executor: default
+    steps:
+      - attach_project
+      - run:
+          name: Trigger publish
+          no_output_timeout: 30m
+          command: npx expo-cli publish --non-interactive --release-channel production
+      - slack/notify:
+          event: pass
+          template: success_tagged_deploy_1
+      - slack/notify:
+          event: fail
+          mentions: '@appdevs'
+          template: basic_fail_1  
+orbs:
+  aws-cli: circleci/aws-cli@2.0.6
+  slack: circleci/slack@4.5.2
+workflows:
+  'Fairtasting Mobile App':
+    jobs:
+      - 'Install Dependencies'
+      - 'EXPO Test Publish':
+          requires:
+            - 'Install Dependencies'
+          filters:
+            branches:
+              only: development
+      - 'EXPO Stage Publish':
+          requires:
+            - 'Install Dependencies'
+          filters:
+            branches:
+              only: master
+      - production-deployment:
+          name: 'Publish OTA Update'
+          type: approval
+          requires:
+            - 'Install Dependencies'
+            - 'EXPO Stage Publish'
+          filters:
+            branches:
+              only: master
+      - 'OTA Production Publish':
+          requires:
+            - 'Install Dependencies'
+            - 'Publish OTA Update'
+          filters:
+            branches:
+              only: master
+      - production-deployment:
+          name: 'Publish to App Stores'
+          type: approval
+          requires:
+            - 'Install Dependencies'
+            - 'EXPO Stage Publish'
+          filters:
+            branches:
+              only: master
+      - 'App Store Publish':
+          requires:
+            - 'Publish to App Stores'
+            - 'Install Dependencies'
+          filters:
+            branches:
+              only: master
+      - 'Google Play Publish':
+          requires:
+            - 'Publish to App Stores'
+            - 'Install Dependencies'
+          filters:
+            branches:
+              only: master
+  'Website Build and Deployment':
+    jobs:
+      - 'Deploy Web to Development':
+          filters:
+            branches:
+              ignore:
+                - master
+                - devlopment
+      - 'Deploy Web to Testing':
+          filters:
+            branches:
+              only: development
+      - production-deployment:
+          name: 'Deploy to Production'
+          type: approval
+          filters:
+            branches:
+              only: master
+      - 'Deploy Web to Production':
+          requires:
+            - 'Deploy to Production'
+          filters:
+            branches:
+              only: master

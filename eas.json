@@ -1,0 +1,76 @@
+{
+    "cli": {
+        "version": ">= 0.34.0"
+    },
+    "submit": {
+        "production": {
+            "android": {
+                "serviceAccountKeyPath": "pc-api-6859857320842646434-637-da8884777019.json",
+                "track": "production",
+                "releaseStatus": "completed"
+            },
+            "ios": {
+                "appleId": "peter@fairtasting.com",
+                "ascAppId": "1562711645",
+                "appleTeamId": "75HBBWP8QM"
+            }
+        }
+    },
+    "build": {
+        "release": {
+            "android": {
+                "cache": {
+                    "disabled": true
+                }
+            },
+            "ios": {
+                "image": "latest",
+                "cache": {
+                    "disabled": true
+                }
+            }
+        },
+        "testing": {
+            "android": {
+                "cache": {
+                    "disabled": true
+                }
+            },
+            "ios": {
+                "image": "latest",
+                "cache": {
+                    "disabled": true
+                }
+            },
+            "releaseChannel": "testing"
+        },
+        "staging": {
+            "android": {
+                "cache": {
+                    "disabled": true
+                }
+            },
+            "ios": {
+                "image": "latest",
+                "cache": {
+                    "disabled": true
+                }
+            },
+            "releaseChannel": "staging"
+        },
+        "production": {
+            "android": {
+                "cache": {
+                    "disabled": true
+                }
+            },
+            "ios": {
+                "image": "latest",
+                "cache": {
+                    "disabled": true
+                }
+            },
+            "releaseChannel": "production"
+        }
+    }
+}
