@@ -75,3 +75,11 @@ web-build/
 # @end expo-cli
 src/screens/wine/WineDetail copy.tsx
 src/components/common/PieChart/index copy.tsx
+
+# google service
+
+app.json
+eas.json
+google-services.json
+GoogleService-Info.plist
+pc-api-6859857320842646434-637-da8884777019.json
